@@ -1,9 +1,11 @@
 use std::cmp::max;
+use rayon::prelude::*;
+
 advent_of_code::solution!(2);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let i: u32 = input
-        .lines()
+        .par_lines()
         .filter(|l| {
             l.split(":")
                 .last()
@@ -46,31 +48,33 @@ pub fn part_one(input: &str) -> Option<u32> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let i: u32 = input
-        .lines()
+        .par_lines()
         .map(|l| {
-
             let (mut r, mut g, mut b) = (0, 0, 0);
-            l.split(":").last().unwrap().split(";").map(|round| {
-                let _ = round
-                    .split(",")
-                    .map(|throw| {
-                        let mut nums = throw.split(" ");
-                        nums.next();
-                        let amount = nums.next().unwrap().parse::<u32>().unwrap();
-                        let color = nums.next().unwrap();
-                        match color {
-                            "green" => g = max(g, amount),
-                            "blue" => b = max(b, amount),
-                            "red" => r = max(r, amount),
-                            _ => {
-                                println!("{color}");
+            l.split(":")
+                .last()
+                .unwrap()
+                .split(";")
+                .map(|round| {
+                    let _ = round
+                        .split(",")
+                        .map(|throw| {
+                            let mut nums = throw.split(" ");
+                            let _ = nums.next();
+                            let amount = nums.next().unwrap().parse::<u32>().unwrap();
+                            let color = nums.next().unwrap();
+                            match color {
+                                "green" => g = max(g, amount),
+                                "blue" => b = max(b, amount),
+                                "red" => r = max(r, amount),
+                                _ => {
+                                    println!("{color}");
+                                }
                             }
-                        }
-                    })
-                    .count();
-
-            }
-            ).count();
+                        })
+                        .count();
+                })
+                .count();
             r * b * g
         })
         .sum();

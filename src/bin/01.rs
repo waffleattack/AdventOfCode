@@ -1,8 +1,8 @@
-
+use rayon::prelude::*;
 advent_of_code::solution!(1);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(input.lines().map(|l| {
+    Some(input.par_lines().map(|l| {
         let mut s = l.as_bytes().iter().filter(|x| x.is_ascii_digit()).peekable();
         (*s.peek().unwrap() - b'0') as u32 * 10 + (*s.last().unwrap() - b'0') as u32
     }).sum())
@@ -14,7 +14,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     ];
 
     Some(input
-        .lines()
+        .par_lines()
         .map(|l| {
 
             let mut pos_l = l
