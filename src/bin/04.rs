@@ -30,21 +30,20 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-
     let cards = input
         .par_lines()
-        .into_par_iter()
-        .map(parse_line).collect::<Vec<ScratchOff>>();
+        .map(parse_line)
+        .collect::<Vec<ScratchOff>>();
     let len = cards.len();
-    let mut dupes:Vec<u32> = vec![1; len as usize];
+    let mut dupes: Vec<u32> = vec![1; len as usize];
 
-    for (x, card) in cards.iter().enumerate(){
+    for (x, card) in cards.iter().enumerate() {
         if card.matches == 0 {
             continue;
         }
         let duped_times = dupes.get(x).copied().unwrap();
-        let duped_cards = &mut dupes[x+1..(x+card.matches  as usize +1)];
-        for x in duped_cards{
+        let duped_cards = &mut dupes[x + 1..(x + card.matches as usize + 1)];
+        for x in duped_cards {
             *x += duped_times
         }
     }
@@ -52,22 +51,23 @@ pub fn part_two(input: &str) -> Option<u32> {
 }
 
 pub fn parse_line(line: &str) -> ScratchOff {
-    let mut temp = line
+    let temp = line
         .split(":")
         .last()
         .expect("there should be stuff after colon")
-        .split("|")
+        .split('|')
         .map(|l| {
             l.split(" ")
                 .filter(|n| *n != "")
                 .map(|n| n.parse::<u32>().unwrap())
                 .collect::<HashSet<u32>>()
-        });
+        })
+        .collect::<Vec<HashSet<u32>>>();
 
     ScratchOff::new(
-        temp.next()
+        temp.get(0)
             .unwrap()
-            .intersection(&temp.next().unwrap())
+            .intersection(&temp.get(1).unwrap())
             .count() as u32,
     )
 }

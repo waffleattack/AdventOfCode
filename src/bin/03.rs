@@ -6,13 +6,9 @@ use rayon::prelude::*;
 struct Run {
     is_part: bool,
     num: String,
-    pos: (usize, usize),
-    len: usize,
-    is_num: bool,
 }
 #[derive(Debug)]
 struct RunP2 {
-    is_part: bool,
     num: Option<u32>,
     pos: (usize, usize),
     len: usize,
@@ -24,7 +20,6 @@ pub fn part_one(input: &str) -> Option<u32> {
         .lines()
         .map(|f| f.chars().map(|f| f.to_string()).collect_vec())
         .collect_vec();
-    println!("{}", lines.get(1).unwrap().get(0).unwrap());
     Some(
         input
             .lines()
@@ -36,7 +31,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                 l.chars()
                     .group_by(|x| x.is_ascii_digit())
                     .into_iter()
-                    .map(|(ge0, group)| {
+                    .map(|(_ge0, group)| {
                         let g = group.collect_vec();
                         let len = g.len();
 
@@ -61,9 +56,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                         Run {
                             is_part: part,
                             num,
-                            pos: (x - len, y),
-                            len,
-                            is_num: ge0,
+
                         }
                     })
                     .filter(|r| r.is_part)
@@ -92,7 +85,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                     .collect_vec()
                     .iter()
                     .enumerate()
-                    .filter(|(x, c)| *c == "*")
+                    .filter(|(_x, c)| *c == "*")
                     .map(|(x, _)| (x, y))
                     .collect::<Vec<_>>()
             })
@@ -121,10 +114,9 @@ pub fn part_two(input: &str) -> Option<u32> {
                                             g.iter().map(|c| c.to_string()).join("").parse().ok();
                                         curr_x += len;
                                         RunP2 {
-                                            is_part: false,
                                             pos: (curr_x - len, y),
                                             num,
-                                            len: len-1,
+                                            len: len - 1,
                                             is_num: g0,
                                         }
                                     })
@@ -136,8 +128,16 @@ pub fn part_two(input: &str) -> Option<u32> {
                     })
                     .filter_map(|o| o.map(|v| v.iter().map(|r| r.num.unwrap()).collect_vec()))
                     .collect_vec()
-            }).map(|v| v.iter().filter(|v|!v.is_empty()).map(|v|v[0]).collect_vec()).filter(|f| f.len() == 2).map(|v| v[0]*v[1])
-            .sum::<u32>() ,
+            })
+            .map(|v| {
+                v.iter()
+                    .filter(|v| !v.is_empty())
+                    .map(|v| v[0])
+                    .collect_vec()
+            })
+            .filter(|f| f.len() == 2)
+            .map(|v| v[0] * v[1])
+            .sum::<u32>(),
     )
 }
 
